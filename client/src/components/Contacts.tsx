@@ -7,7 +7,7 @@ const Contacts: React.FC = () => {
 
   return (
     <ListGroup variant="flush">
-      {contacts.map((contact) => {
+      {contacts?.map((contact) => {
         return <ListGroup.Item key={contact.id}>{contact.name}</ListGroup.Item>;
       })}
     </ListGroup>

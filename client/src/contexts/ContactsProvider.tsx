@@ -28,7 +28,10 @@ export const ContactsProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [contacts, setContacts] = useLocalStorage<Contact[]>("contacts");
+  const [contacts, setContacts] = useLocalStorage<Contact[]>(
+    "contacts",
+    () => []
+  );
 
   const createContact = (id: string, name: string) => {
     setContacts((prevContacts: Contact[]) => [...prevContacts, { id, name }]);
