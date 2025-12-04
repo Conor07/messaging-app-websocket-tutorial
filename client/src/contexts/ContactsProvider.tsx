@@ -34,11 +34,16 @@ export const ContactsProvider = ({
   );
 
   const createContact = (id: string, name: string) => {
-    setContacts((prevContacts: Contact[]) => [...prevContacts, { id, name }]);
+    setContacts((prevContacts) => {
+      const current = prevContacts ?? [];
+      return [...current, { id, name }];
+    });
   };
 
   return (
-    <ContactsContext.Provider value={{ contacts, createContact }}>
+    <ContactsContext.Provider
+      value={{ contacts: contacts ?? [], createContact }}
+    >
       {children}
     </ContactsContext.Provider>
   );

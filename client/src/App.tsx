@@ -8,7 +8,9 @@ import { SocketProvider } from "./contexts/SocketProvider.tsx";
 function App() {
   const [id, setId] = useLocalStorage<string>("id");
 
-  const dashboard = (
+  if (!id) return <Login onIdSubmit={setId} />;
+
+  return (
     <SocketProvider id={id}>
       <ContactsProvider>
         <ConversationsProvider id={id}>
@@ -17,8 +19,6 @@ function App() {
       </ContactsProvider>
     </SocketProvider>
   );
-
-  return <>{id ? dashboard : <Login onIdSubmit={setId} />}</>;
 }
 
 export default App;

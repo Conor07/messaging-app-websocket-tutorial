@@ -23,7 +23,7 @@ export type FormattedConversation = {
     text: string;
   }[];
   selected: boolean;
-} & Conversation;
+};
 
 type ConversationsContextType = {
   //   conversations: Conversation[];
@@ -67,10 +67,10 @@ export const ConversationsProvider = ({
   const { socket } = useSocket();
 
   const createConversation = (recipients: string[]) => {
-    setConversations((prevConversations: Conversation[]) => [
-      ...prevConversations,
-      { recipients, messages: [] },
-    ]);
+    setConversations((prevConversations) => {
+      const current = prevConversations ?? [];
+      return [...current, { recipients, messages: [] }];
+    });
   };
 
   const addMessageToConversation = useCallback(
@@ -83,30 +83,29 @@ export const ConversationsProvider = ({
       text: string;
       sender: string;
     }) => {
-      setConversations((prevConversations: Conversation[]) => {
+      setConversations((prevConversations) => {
+        const current = prevConversations ?? [];
         let madeChange: boolean = false;
 
         const newMessage: { sender: string; text: string } = { sender, text };
 
-        const newConversations: Conversation[] = prevConversations?.map(
-          (conversation) => {
-            if (arrayEquality(conversation?.recipients, recipients)) {
-              madeChange = true;
+        const newConversations: Conversation[] = current.map((conversation) => {
+          if (arrayEquality(conversation?.recipients, recipients)) {
+            madeChange = true;
 
-              return {
-                ...conversation,
-                messages: [...conversation.messages, newMessage],
-              };
-            }
-
-            return conversation;
+            return {
+              ...conversation,
+              messages: [...conversation.messages, newMessage],
+            };
           }
-        );
+
+          return conversation;
+        });
 
         if (madeChange) {
           return newConversations;
         } else {
-          return [...prevConversations, { recipients, messages: [newMessage] }];
+          return [...current, { recipients, messages: [newMessage] }];
         }
       });
     },
@@ -128,7 +127,7 @@ export const ConversationsProvider = ({
     };
   }, [socket, addMessageToConversation]);
 
-  const formattedConversations = conversations?.map(
+  const formattedConversations = (conversations ?? []).map(
     (conversation: Conversation, index: number) => {
       const recipients = conversation.recipients.map((recipient) => {
         const contact = contacts.find((contact: Contact) => {
@@ -158,9 +157,15 @@ export const ConversationsProvider = ({
     }
   );
 
+  const selected = formattedConversations[selectedConversationIndex] ?? {
+    recipients: [],
+    messages: [],
+    selected: false,
+  };
+
   const value = {
     conversations: formattedConversations,
-    selectedConversation: formattedConversations[selectedConversationIndex],
+    selectedConversation: selected,
     selectConversationIndex: setSelectedConversationIndex,
     createConversation,
     sendMessage,
